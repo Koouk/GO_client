@@ -11,12 +11,11 @@ namespace GOclient
         private SpriteFont _font;
         private networking _net;
 
-        private int _score = 0;
         private string temp = "";
 
         public Game1()
         {
-            
+
             _graphics = new GraphicsDeviceManager(this);
             _net = new networking("192.168.1.12", 1024);
             Content.RootDirectory = "Content";
@@ -46,7 +45,8 @@ namespace GOclient
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             if (_net.Status == ConnectionStatus.free)
-            { if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.S))
                     _net.send("141295");
                 // TODO: Add your update logic here
 
@@ -63,16 +63,16 @@ namespace GOclient
             _spriteBatch.Begin();
 
 
-            
-            if(_net.Status == ConnectionStatus.recieved)
+
+            if (_net.Status == ConnectionStatus.recieved)
             {
                 this.temp = _net.RecData;
                 _net.Status = ConnectionStatus.free;
 
             }
 
-            
-                
+
+
 
             _spriteBatch.DrawString(_font, this.temp + "  " + _net.Status, new Vector2(300, 300), Color.Black);
 

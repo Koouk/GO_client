@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -18,14 +17,15 @@ namespace GOclient
 
     class networking
     {
+        private static char STOP = '\n';
         private static readonly int BUF_SIZE = 1024;
         private Socket _socket;
-        private String _address;
+        private string _address;
         private int _port;
 
         public string RecData { get; set; }
         public bool IsConnected { get; private set; }
-        public ConnectionStatus Status { get;  set; }
+        public ConnectionStatus Status { get; set; }
 
         public networking(String address, int port)
         {
@@ -55,6 +55,7 @@ namespace GOclient
         public void receive()
         {
             Status = ConnectionStatus.receiving;
+            RecData = "";
             RecBuffer buffer = new RecBuffer();
             _socket.BeginReceive(buffer.buff, 0, BUF_SIZE, 0, new AsyncCallback(ReceiveCallback), buffer);
 
@@ -73,13 +74,13 @@ namespace GOclient
             {
                 RecBuffer data = (RecBuffer)ar.AsyncState;
                 int count = _socket.EndReceive(ar);
-                if(count == 0)
+                if (count == 0)
                 {
 
-                    Console.WriteLine(" Connection closed " );
+                    Console.WriteLine(" Connection closed ");
 
                 }
-                if (data.buff[count - 1] != '\n')
+                if (data.buff[count - 1] != STOP)
                 {
                     data.rec.Append(Encoding.ASCII.GetString(data.buff, 0, count));
                     _socket.BeginReceive(data.buff, 0, BUF_SIZE, 0, new AsyncCallback(ReceiveCallback), data);
@@ -116,7 +117,7 @@ namespace GOclient
             catch (Exception exc)
             {
                 Console.WriteLine(" Error while sending data: " + exc.Message.ToString());
-                
+
             }
         }
 
@@ -156,7 +157,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
-                Console.WriteLine("Error while connecting to serwer "+ exc.Message.ToString());
+                Console.WriteLine("Error while connecting to serwer " + exc.Message.ToString());
                 _socket = null;
             }
         }
