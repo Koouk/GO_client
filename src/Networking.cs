@@ -3,6 +3,8 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
+using System.Text.Json;
+
 
 namespace GOclient
 {
@@ -11,11 +13,19 @@ namespace GOclient
         free,
         connecting,
         sending,
+        sent,
         receiving,
         recieved
     }
 
-    class networking
+    public class DataTemplate
+    {
+        public String Type { get; set; }
+        public String Data { get; set; }
+
+    }
+
+    class Networking
     {
         private static char STOP = '\n';
         private static readonly int BUF_SIZE = 1024;
@@ -27,7 +37,7 @@ namespace GOclient
         public bool IsConnected { get; private set; }
         public ConnectionStatus Status { get; set; }
 
-        public networking(String address, int port)
+        public Networking(String address, int port)
         {
             _address = address;
             _port = port;
@@ -35,8 +45,13 @@ namespace GOclient
             Status = ConnectionStatus.free;
         }
 
-
-        public void connect()
+        public DataTemplate GetData()
+        {
+            //obsluzyc wyjatek !
+            var data = JsonSerializer.Deserialize<DataTemplate>(RecData);
+            return data;
+        }
+        public void Connect()
         {
             Status = ConnectionStatus.connecting;
             Dns.BeginGetHostByName(_address, new AsyncCallback(GetHostEntryCallback), null);
@@ -44,15 +59,28 @@ namespace GOclient
         }
 
 
-        public void send(String toSend)
+        public void Send(String type, String data)
         {
             Status = ConnectionStatus.sending;
-            SendBuffer data = new SendBuffer();
-            data.buff = Encoding.ASCII.GetBytes(toSend);
-            _socket.BeginSend(data.buff, 0, data.buff.Length, 0, new AsyncCallback(SendCallback), data);
+
+            var structure = new DataTemplate
+            {
+                Type = type,
+                Data = data
+            };
+
+            string jsonString = JsonSerializer.Serialize(structure);
+
+            SendBuffer buffer = new SendBuffer
+            {
+                buff = Encoding.ASCII.GetBytes(jsonString)
+            };
+
+
+            _socket.BeginSend(buffer.buff, 0, buffer.buff.Length, 0, new AsyncCallback(SendCallback), buffer);
         }
 
-        public void receive()
+        public void Receive()
         {
             Status = ConnectionStatus.receiving;
             RecData = "";
@@ -61,7 +89,7 @@ namespace GOclient
 
         }
 
-        public void close()
+        public void Close()
         {
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
@@ -78,11 +106,14 @@ namespace GOclient
                 {
 
                     Console.WriteLine(" Connection closed ");
+                    return;
 
                 }
                 if (data.buff[count - 1] != STOP)
                 {
                     data.rec.Append(Encoding.ASCII.GetString(data.buff, 0, count));
+
+                    Debug.WriteLine(data.rec);
                     _socket.BeginReceive(data.buff, 0, BUF_SIZE, 0, new AsyncCallback(ReceiveCallback), data);
                 }
                 else
@@ -111,7 +142,7 @@ namespace GOclient
                 }
                 else
                 {
-                    Status = ConnectionStatus.free;
+                    Status = ConnectionStatus.sent;
                 }
             }
             catch (Exception exc)
@@ -161,6 +192,7 @@ namespace GOclient
                 _socket = null;
             }
         }
+
 
 
         private class SendBuffer
