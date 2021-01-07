@@ -37,8 +37,10 @@ namespace GOclient
         public bool IsConnected { get; private set; }
         public ConnectionStatus Status { get; set; }
 
+        public int Error { get; private set; }
         public Networking(String address, int port)
         {
+            Error = 0;
             _address = address;
             _port = port;
             IsConnected = false;
@@ -126,6 +128,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
+                Error = -1;
                 Debug.WriteLine(" Error while receiving data: " + exc.Message.ToString());
             }
         }
@@ -148,6 +151,8 @@ namespace GOclient
             }
             catch (Exception exc)
             {
+                Error = -1;
+
                 Debug.WriteLine(" Error while sending data: " + exc.Message.ToString());
 
             }
@@ -174,6 +179,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
+                Error = -1;
                 Debug.WriteLine(" Error while creating socket: " + exc.Message.ToString());
             }
         }
@@ -189,6 +195,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
+                Error = -1;
                 Debug.WriteLine("Error while connecting to serwer " + exc.Message.ToString());
                 _socket = null;
             }

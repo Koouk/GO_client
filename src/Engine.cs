@@ -28,7 +28,7 @@ namespace GOclient
         {
 
             _window = new RenderWindow(new VideoMode(1600, 1200), "SFML.NET");
-            Networking _net = new Networking("192.168.1.12", 1024);
+            _net = new Networking("192.168.1.12", 1024);
             _net.Connect();
 
             _game = new Game(_window,_net, Color);
@@ -80,12 +80,15 @@ namespace GOclient
                 {
                     //pobierz wyniki, narysuj, zakoncz polaczenie i wyjdz
                 }
+                if(_net.Error == -1)
+                {
+                    _window.Close();
+                }
 
                 _gameStatus = _lobby.Status;
                 _window.DispatchEvents();
                 _window.Clear();
-                _game.Draw();
-                if (!_gameStatus && false)
+                if (!_gameStatus )
                 {
                     _lobby.Update();
                     _lobby.Draw();
