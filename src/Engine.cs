@@ -6,6 +6,7 @@ namespace GOclient
 {
     public enum PlayerColor
     {
+        none,
         white,
         black
     }
@@ -25,7 +26,7 @@ namespace GOclient
         private void Initialize()
         {
 
-            _window = new RenderWindow(new VideoMode(1600, 1000), "SFML.NET");
+            _window = new RenderWindow(new VideoMode(1600, 1200), "SFML.NET");
             Networking _net = new Networking("192.168.1.12", 1024);
             _net.Connect();
 
@@ -82,8 +83,8 @@ namespace GOclient
                 _gameStatus = _lobby.Status;
                 _window.DispatchEvents();
                 _window.Clear();
-
-                if (!_gameStatus)
+                _game.Draw();
+                if (!_gameStatus && false)
                 {
                     _lobby.Update();
                     _lobby.Draw();

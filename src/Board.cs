@@ -9,40 +9,127 @@ namespace GOclient
 {
     class Board : Drawable
     {
-        Font font;
-        Text text;
-        public Board()
+        private uint _size;
+        private float _windowHeight, _windowWidth, _wDistance, _hDistance;
+        private PlayerColor[,] _gameBoard;
+        private List<Tuple<int,int>> _blackStones, _whiteStones;
+
+
+        public Board(uint size, float height, float width)
         {
-             font = new Font("C:/Windows/Fonts/arial.ttf");
-             text = new Text("Hello World!", font);
+            _gameBoard = new PlayerColor[_size, _size];
+            for(int i = 0; i < _gameBoard.GetLength(0); i++)
+{
+                for (int j = 0; j < _gameBoard.GetLength(1); j++)
+                {
+                    _gameBoard[i, j] = PlayerColor.none;
+                }
+            }
+
+            _blackStones = new List<Tuple<int, int>>();
+            _whiteStones = new List<Tuple<int, int>>();
+
+            _size = size;
+            _windowHeight = height;
+            _windowWidth = width;
+            _wDistance = _windowWidth / (_size + 1);
+            _hDistance = _windowHeight / (_size + 1);
+
         }
+
         public void Draw(RenderTarget target, RenderStates states)
         {
+            DrawBoard( target,  states);
+            DrawStones(target, states);
+
+        }
+        public Tuple<bool,Tuple<int,int>> TryPlaceStone(Vector2f mousePosition)
+        {
+
+            float x = mousePosition.X  - _wDistance;
+            float y = mousePosition.Y  - _hDistance;
+            float col = x / _wDistance;
+            float row = y / _hDistance;
+            int c = (int)Math.Round(col, MidpointRounding.AwayFromZero);
+            int r = (int)Math.Round(row, MidpointRounding.AwayFromZero);
+
+            var data = new Tuple<bool, Tuple<int, int>>(false, new Tuple<int, int>(r, c));
+            if ((c - col) * (c - col) > 1f / 16)
+                return data;
+            if ((r - row) * (r - row) > 1f / 16)
+                return data;
+            if (r < 0 || c < 0 || r >= _size || c >= _size)
+                return data;
             
-            text.CharacterSize = 40;
-            float textWidth = text.GetLocalBounds().Width;
-            float textHeight = text.GetLocalBounds().Height;
-            float xOffset = text.GetLocalBounds().Left;
-            float yOffset = text.GetLocalBounds().Top;
-            text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
-            text.Position = new Vector2f(target.Size.X / 2f, target.Size.Y / 2f);
-            target.Draw(text);
-        }
-        public bool TryPlaceStone(Vector2f mousePosition)
-        {
-
-            return true;
-        }
-        public Tuple<int,int> GetIndex(Vector2f mousePosition)
-        {
-
-            return new Tuple<int, int>(0, 0);
+            return new Tuple<bool, Tuple<int, int>>(true, new Tuple<int, int>(r, c));
         }
 
-        public void Move(Tuple<int, int> move)
+
+        public void Move(Tuple<int, int> move, PlayerColor color)
         {
+            _gameBoard[move.Item1, move.Item2] = color;
+            if( color == PlayerColor.black)
+            {
+                _blackStones.Add(move);
+            }
+            else
+            {
+                _whiteStones.Add(move);
+            }    
 
+        }
 
+        private void DrawBoard(RenderTarget target, RenderStates states)
+        {
+            var background = new RectangleShape
+            {
+                Size = new Vector2f(_windowWidth, _windowHeight),
+                FillColor = Color.White
+            };
+            target.Draw(background);
+
+            var horizontalLine = new RectangleShape
+            {
+                FillColor = Color.Black,
+                Size = new Vector2f( (_size-1) *  _wDistance, 5f)
+            };
+            var verticalLine = new RectangleShape
+            {
+                FillColor = Color.Black,
+                Size = new Vector2f(5f, (_size-1) * _hDistance)
+            };
+            for(int i =0; i<_size  ; i++)
+            {
+
+                horizontalLine.Position = new Vector2f(_wDistance , _hDistance + _hDistance * i);
+                verticalLine.Position = new Vector2f( _wDistance + _wDistance * i, _hDistance);
+                target.Draw(horizontalLine);
+                target.Draw(verticalLine);
+
+            }
+        }
+
+        private void DrawStones(RenderTarget target, RenderStates states)
+        {
+            var stone = new CircleShape
+            {
+                Radius = _wDistance / 4f,
+                OutlineColor = Color.Black,
+                OutlineThickness = 5f,
+                FillColor = Color.White
+            };
+
+            foreach (var pos in _whiteStones)
+            {
+                stone.Position = new Vector2f(_wDistance + _wDistance * pos.Item1, _hDistance + _hDistance * pos.Item2);
+                target.Draw(stone);
+            }
+            stone.FillColor = Color.Black;
+            foreach (var pos in _blackStones)
+            {
+                stone.Position = new Vector2f(_wDistance + _wDistance * pos.Item1, _hDistance + _hDistance * pos.Item2);
+                target.Draw(stone);
+            }
         }
     }
 }

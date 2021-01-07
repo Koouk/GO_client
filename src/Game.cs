@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
 
@@ -28,7 +25,7 @@ namespace GOclient
             _inputStatus = 0;
             InGame = true;
 
-            _board = new Board();
+            _board = new Board(9, (float)_window.Size.Y, _window.Size.X * 0.75f);
             _passButton = new Button(40, new Vector2f(_window.Size.X * 0.80f, _window.Size.Y * 0.33f ), "PASS" );
             _resignButton = new Button(40, new Vector2f(_window.Size.X * 0.80f, _window.Size.Y * 0.66f), "RESIGN");
 
@@ -64,11 +61,11 @@ namespace GOclient
                     _inputStatus = 2;
                 else
                 {
-                    
-                    if(_board.TryPlaceStone(mousePosition))
+                    var res = _board.TryPlaceStone(mousePosition);
+                    if (res.Item1)
                     {
                         _inputStatus = 3;
-                        _lastMove = _board.GetIndex(mousePosition);
+                        _lastMove = res.Item2;
                     }
                         
                 }
@@ -121,9 +118,10 @@ namespace GOclient
                 {
                     if(rec.Data == "accept")
                     {
-                        _currentTurn = (PlayerColor)((int)_currentTurn ^ 1);
+                        
                         if (_inputStatus == 3)
-                            _board.Move(_lastMove);
+                            _board.Move(_lastMove, _currentTurn);
+                        _currentTurn = (PlayerColor)((int)_currentTurn ^ 1);
                     }
                     
                 }
@@ -149,7 +147,7 @@ namespace GOclient
                 {
                     var subs = data.Type.Split(' ');
                     var move = new Tuple<int, int>(int.Parse(subs[0]), int.Parse(subs[1]));
-                    _board.Move(move);
+                    _board.Move(move, _currentTurn);
                     _currentTurn = (PlayerColor)((int)_currentTurn ^ 1);
                 }
                 else if (data.Type == "button")
