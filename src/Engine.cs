@@ -6,9 +6,10 @@ namespace GOclient
 {
     public enum PlayerColor
     {
-        none,
+        
         white,
-        black
+        black,
+        none
     }
 
     class Engine

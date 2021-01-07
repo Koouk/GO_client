@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
 
@@ -17,7 +15,7 @@ namespace GOclient
 
         public Board(uint size, float height, float width)
         {
-            _gameBoard = new PlayerColor[_size, _size];
+            _gameBoard = new PlayerColor[size, size];
             for(int i = 0; i < _gameBoard.GetLength(0); i++)
 {
                 for (int j = 0; j < _gameBoard.GetLength(1); j++)
@@ -53,7 +51,7 @@ namespace GOclient
             int c = (int)Math.Round(col, MidpointRounding.AwayFromZero);
             int r = (int)Math.Round(row, MidpointRounding.AwayFromZero);
 
-            var data = new Tuple<bool, Tuple<int, int>>(false, new Tuple<int, int>(r, c));
+            var data = new Tuple<bool, Tuple<int, int>>(false, new Tuple<int, int>(c,r));
             if ((c - col) * (c - col) > 1f / 16)
                 return data;
             if ((r - row) * (r - row) > 1f / 16)
@@ -61,7 +59,7 @@ namespace GOclient
             if (r < 0 || c < 0 || r >= _size || c >= _size)
                 return data;
             
-            return new Tuple<bool, Tuple<int, int>>(true, new Tuple<int, int>(r, c));
+            return new Tuple<bool, Tuple<int, int>>(true, new Tuple<int, int>(c, r));
         }
 
 
@@ -121,13 +119,13 @@ namespace GOclient
 
             foreach (var pos in _whiteStones)
             {
-                stone.Position = new Vector2f(_wDistance + _wDistance * pos.Item1, _hDistance + _hDistance * pos.Item2);
+                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item1, _hDistance * 0.75f + _hDistance * pos.Item2);
                 target.Draw(stone);
             }
             stone.FillColor = Color.Black;
             foreach (var pos in _blackStones)
             {
-                stone.Position = new Vector2f(_wDistance + _wDistance * pos.Item1, _hDistance + _hDistance * pos.Item2);
+                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item1, _hDistance * 0.75f + _hDistance * pos.Item2);
                 target.Draw(stone);
             }
         }
