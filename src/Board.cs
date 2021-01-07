@@ -28,5 +28,21 @@ namespace GOclient
             text.Position = new Vector2f(target.Size.X / 2f, target.Size.Y / 2f);
             target.Draw(text);
         }
+        public bool TryPlaceStone(Vector2f mousePosition)
+        {
+
+            return true;
+        }
+        public Tuple<int,int> GetIndex(Vector2f mousePosition)
+        {
+
+            return new Tuple<int, int>(0, 0);
+        }
+
+        public void Move(Tuple<int, int> move)
+        {
+
+
+        }
     }
 }

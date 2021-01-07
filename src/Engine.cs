@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SFML.Window;
+﻿using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
 
 namespace GOclient
 {
-
+    public enum PlayerColor
+    {
+        white,
+        black
+    }
 
     class Engine
     {
+        public PlayerColor Color { get; set; }
 
         private RenderWindow _window;
         private Networking _net;
@@ -23,12 +25,12 @@ namespace GOclient
         private void Initialize()
         {
 
-            _window = new RenderWindow(new VideoMode(500, 500), "SFML.NET");
+            _window = new RenderWindow(new VideoMode(1600, 1000), "SFML.NET");
             Networking _net = new Networking("192.168.1.12", 1024);
             _net.Connect();
 
-            _game = new Game(_window,_net);
-            _lobby = new Lobby(_window, _net);
+            _game = new Game(_window,_net, Color);
+            _lobby = new Lobby(_window, _net, this);
 
             _gameStatus = false;
             InitializePollEvents();
@@ -70,9 +72,13 @@ namespace GOclient
         {
             Initialize();
 
-
             while (_window.IsOpen)
             {
+                if(!_game.InGame)
+                {
+                    //pobierz wyniki, narysuj, zakoncz polaczenie i wyjdz
+                }
+
                 _gameStatus = _lobby.Status;
                 _window.DispatchEvents();
                 _window.Clear();

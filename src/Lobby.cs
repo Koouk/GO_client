@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SFML.Window;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.System;
 
 namespace GOclient
 {
+   
+
     class Lobby
     {
 
@@ -14,12 +12,13 @@ namespace GOclient
         private Networking _net;
         private Button _playButton;
         private Font font;
-
+        private Engine _engine;
         public bool Status { get; private set; }
-        public Lobby(RenderWindow window, Networking net)
+        public Lobby(RenderWindow window, Networking net, Engine engine)
         {
             _window = window;
             _net = net;
+            _engine = engine;
             _playButton = new Button(50, new SFML.System.Vector2f(200, 200), "PLAY")
             {
                 Clicked = false
@@ -69,10 +68,15 @@ namespace GOclient
             {
                 var response = _net.GetData();
                 _net.Status = ConnectionStatus.free;
-                if (response.Type == "lobby" && response.Data == "found")
+                if (response.Type == "found" )
                 {
+                    if (response.Data == "white")
+                        _engine.Color = PlayerColor.white;
+                    else
+                        _engine.Color = PlayerColor.black;
                     Status = true;
                     _playButton.Clicked = false;
+                    
                 }
                 else
                 {

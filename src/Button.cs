@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.System;
 
 
@@ -30,12 +27,12 @@ namespace GOclient
            // _text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
             _text.Position = position;
 
-
+            Clicked = false;
             _button = new RectangleShape
             {
                 Size = new Vector2f(textWidth * 1.1f, textHeight * 2),
                 Position = position,
-                FillColor = Color.Blue
+                FillColor = Color.Black
             };
 
         }

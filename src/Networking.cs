@@ -49,6 +49,7 @@ namespace GOclient
         {
             //obsluzyc wyjatek !
             var data = JsonSerializer.Deserialize<DataTemplate>(RecData);
+            Status = ConnectionStatus.free;
             return data;
         }
         public void Connect()
@@ -147,7 +148,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
-                Console.WriteLine(" Error while sending data: " + exc.Message.ToString());
+                Debug.WriteLine(" Error while sending data: " + exc.Message.ToString());
 
             }
         }
@@ -173,7 +174,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
-                Console.WriteLine(" Error while creating socket: " + exc.Message.ToString());
+                Debug.WriteLine(" Error while creating socket: " + exc.Message.ToString());
             }
         }
 
@@ -188,7 +189,7 @@ namespace GOclient
             }
             catch (Exception exc)
             {
-                Console.WriteLine("Error while connecting to serwer " + exc.Message.ToString());
+                Debug.WriteLine("Error while connecting to serwer " + exc.Message.ToString());
                 _socket = null;
             }
         }
