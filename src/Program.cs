@@ -2,13 +2,13 @@
 
 namespace GOclient
 {
-    public static class Program
+    class Program
     {
-        [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            using (var game = new Game1())
-                game.Run();
+            var engine = new Engine();
+            engine.Run();
+            
         }
     }
 }
