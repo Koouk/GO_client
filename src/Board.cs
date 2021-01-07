@@ -35,12 +35,6 @@ namespace GOclient
 
         }
 
-        public void Draw(RenderTarget target, RenderStates states)
-        {
-            DrawBoard( target,  states);
-            DrawStones(target, states);
-
-        }
         public Tuple<bool,Tuple<int,int>> TryPlaceStone(Vector2f mousePosition)
         {
 
@@ -59,24 +53,90 @@ namespace GOclient
             if (r < 0 || c < 0 || r >= _size || c >= _size)
                 return data;
             
-            return new Tuple<bool, Tuple<int, int>>(true, new Tuple<int, int>(c, r));
+            return new Tuple<bool, Tuple<int, int>>(true, new Tuple<int, int>(r, c));
         }
 
 
         public void Move(Tuple<int, int> move, PlayerColor color)
         {
             _gameBoard[move.Item1, move.Item2] = color;
-            if( color == PlayerColor.black)
+            SolveCaptures(move, color);
+            if ( color == PlayerColor.black)
             {
                 _blackStones.Add(move);
             }
             else
             {
                 _whiteStones.Add(move);
-            }    
+            } 
+
+        }
+        private void SolveCaptures(Tuple<int, int> move, PlayerColor color)
+        {
+            var directions = new List<(int,int)> { ( 0, 1 ), (0, -1 ), ( 1, 0 ), ( -1, 0 )};
+            foreach (var dir in directions)
+            {
+                int row = move.Item1 + dir.Item1;
+                int col = move.Item2 + dir.Item2;
+                if(CheckIndex(row,col) && _gameBoard[row,col] != PlayerColor.none && _gameBoard[row,col] != color)
+                {
+
+                    Captures(row, col,color);
+                }
+            }
 
         }
 
+        private void Captures(int row, int col, PlayerColor color)
+        {
+            var visited = new HashSet<int>();
+            var captured = new List<Tuple<int, int>>();
+            var toVisit = new Stack<Tuple<int,int>>();
+
+            visited.Add((int)(row * _size + col));
+            captured.Add(new Tuple<int, int>(row, col));
+            toVisit.Push(new Tuple<int, int>(row, col));
+
+            while(toVisit.Count > 0)
+            {
+                var point = toVisit.Pop();
+                var directions = new List<(int, int)> { (0, 1), (0, -1), (1, 0), (-1, 0) };
+                foreach (var dir in directions)
+                {
+                    int r = point.Item1 + dir.Item1;
+                    int c = point.Item2 + dir.Item2;
+                    if (CheckIndex(r, c) && !visited.Contains((int)((r * _size) + col)) && _gameBoard[r, c] == color)
+                    {
+                        toVisit.Push(new Tuple<int, int>(r, c));
+                        visited.Add((int)(r * _size + c));
+                        captured.Add(new Tuple<int, int>(r, c));
+                    }
+                    else if (CheckIndex(r, c) && _gameBoard[r, c] == PlayerColor.none)
+                        return;
+                }
+            }
+
+            foreach (var point in captured)
+            {
+                _gameBoard[point.Item1, point.Item2] = PlayerColor.none;
+                if(color == PlayerColor.black)
+                {
+                    
+                    _blackStones.Remove(point);
+                }
+                else if(color == PlayerColor.white)
+                {
+                    _whiteStones.Contains(point);
+                }
+            }
+        }
+
+        public void Draw(RenderTarget target, RenderStates states)
+        {
+            DrawBoard(target, states);
+            DrawStones(target, states);
+
+        }
         private void DrawBoard(RenderTarget target, RenderStates states)
         {
             var background = new RectangleShape
@@ -119,15 +179,21 @@ namespace GOclient
 
             foreach (var pos in _whiteStones)
             {
-                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item1, _hDistance * 0.75f + _hDistance * pos.Item2);
+                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item2, _hDistance * 0.75f + _hDistance * pos.Item1);
                 target.Draw(stone);
             }
             stone.FillColor = Color.Black;
             foreach (var pos in _blackStones)
             {
-                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item1, _hDistance * 0.75f + _hDistance * pos.Item2);
+                stone.Position = new Vector2f(_wDistance * 0.75f + _wDistance * pos.Item2, _hDistance * 0.75f + _hDistance * pos.Item1);
                 target.Draw(stone);
             }
+        }
+
+        private bool CheckIndex(int row, int col)
+        {
+            return row >= 0 && row < _size && col >= 0 && col < _size;
+
         }
     }
 }
