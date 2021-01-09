@@ -116,7 +116,7 @@ namespace GOclient
                 var rec = _net.GetData();
                 if (rec.Type == "move" || rec.Type == "button")
                 {
-                    if(rec.Data == "accept")
+                    if(rec.Data == "accepted")
                     {
                         
                         if (_inputStatus == 3)

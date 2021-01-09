@@ -76,13 +76,15 @@ namespace GOclient
 
             while (_window.IsOpen)
             {
-                if(!_game.InGame)
-                {
-                    //pobierz wyniki, narysuj, zakoncz polaczenie i wyjdz
-                }
-                if(_net.Error == -1)
+                if (_net.Error == -1)
                 {
                     _window.Close();
+                }
+
+                if (!_game.InGame)
+                {
+                    //pobierz wyniki, narysuj, zakoncz polaczenie i wyjdz
+                    continue;
                 }
 
                 _gameStatus = _lobby.Status;
@@ -100,6 +102,7 @@ namespace GOclient
                 }
                 _window.Display();
             }
+            _net.Close();
         }
     }
 }

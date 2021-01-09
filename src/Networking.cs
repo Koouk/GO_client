@@ -76,11 +76,17 @@ namespace GOclient
 
             SendBuffer buffer = new SendBuffer
             {
-                buff = Encoding.ASCII.GetBytes(jsonString)
+                buff = Encoding.ASCII.GetBytes(jsonString + "\n") 
             };
 
-
-            _socket.BeginSend(buffer.buff, 0, buffer.buff.Length, 0, new AsyncCallback(SendCallback), buffer);
+            try { 
+                _socket.BeginSend(buffer.buff, 0, buffer.buff.Length, 0, new AsyncCallback(SendCallback), buffer);
+            }
+            catch (Exception exc)
+            {
+                Error = -1;
+                Debug.WriteLine(" Error while sending data: " + exc.Message.ToString());
+            }
         }
 
         public void Receive()
@@ -88,15 +94,23 @@ namespace GOclient
             Status = ConnectionStatus.receiving;
             RecData = "";
             RecBuffer buffer = new RecBuffer();
-            _socket.BeginReceive(buffer.buff, 0, BUF_SIZE, 0, new AsyncCallback(ReceiveCallback), buffer);
-
-        }
+            try { 
+                _socket.BeginReceive(buffer.buff, 0, BUF_SIZE, 0, new AsyncCallback(ReceiveCallback), buffer);
+            }
+            catch (Exception exc)
+            {
+                Error = -1;
+                Debug.WriteLine(" Error while receiving data: " + exc.Message.ToString());
+            }
+}
 
         public void Close()
         {
-            _socket.Shutdown(SocketShutdown.Both);
-            _socket.Close();
-
+            if (_socket != null)
+            {
+                _socket.Shutdown(SocketShutdown.Both);
+                _socket.Close();
+            }
         }
 
         private void ReceiveCallback(IAsyncResult ar)

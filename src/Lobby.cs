@@ -48,7 +48,7 @@ namespace GOclient
                 _window.Draw(_playButton);
             else
             {
-                _window.Draw(new Text("Waiting for players", font));
+                _window.Draw(new Text("Waiting for a game...", font));
             }
         }
 
