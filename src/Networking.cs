@@ -52,6 +52,7 @@ namespace GOclient
             //obsluzyc wyjatek !
             var data = JsonSerializer.Deserialize<DataTemplate>(RecData);
             Status = ConnectionStatus.free;
+            Debug.WriteLine(" Recieved data: " + data.Data + " T: " + data.Type);
             return data;
         }
         public void Connect()
@@ -74,6 +75,7 @@ namespace GOclient
 
             string jsonString = JsonSerializer.Serialize(structure);
 
+            Debug.WriteLine(" Send data: " + jsonString);
             SendBuffer buffer = new SendBuffer
             {
                 buff = Encoding.ASCII.GetBytes(jsonString + "\n") 

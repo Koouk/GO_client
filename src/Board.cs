@@ -127,7 +127,7 @@ namespace GOclient
                 }
                 else if (color == PlayerColor.white)
                 {
-                    _whiteStones.Contains(point);
+                    _whiteStones.Remove(point);
                 }
             }
         }

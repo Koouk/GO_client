@@ -23,7 +23,7 @@ namespace GOclient
             {
                 Clicked = false
             };
-            Status = false;
+            _engine.GameStatus = false;
 
             font = new Font(@"content\fonts\arial.ttf");
         }
@@ -74,7 +74,7 @@ namespace GOclient
                         _engine.Color = PlayerColor.white;
                     else
                         _engine.Color = PlayerColor.black;
-                    Status = true;
+                    _engine.GameStatus = true;
                     _playButton.Clicked = false;
                     
                 }

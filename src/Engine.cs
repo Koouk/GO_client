@@ -15,6 +15,7 @@ namespace GOclient
     class Engine
     {
         public PlayerColor Color { get; set; }
+        public bool GameStatus { get; set; }
 
         private RenderWindow _window;
         private Networking _net;
@@ -23,7 +24,6 @@ namespace GOclient
         private Lobby _lobby;
         private Vector2f _currentMousePosition;
 
-        private bool _gameStatus;
         private void Initialize()
         {
 
@@ -31,10 +31,10 @@ namespace GOclient
             _net = new Networking("192.168.1.12", 1024);
             _net.Connect();
 
-            _game = new Game(_window,_net, Color);
+            _game = new Game(_window,_net, this);
             _lobby = new Lobby(_window, _net, this);
 
-            _gameStatus = false;
+            GameStatus = false;
             InitializePollEvents();
         }
 
@@ -60,7 +60,7 @@ namespace GOclient
                 if (e.Button == Mouse.Button.Left)
                 {
                         _currentMousePosition = _window.MapPixelToCoords(Mouse.GetPosition(_window));
-                        if (!_gameStatus)
+                        if (!GameStatus)
                             _lobby.HandleInput(_currentMousePosition);
                         else
                             _game.HandleInput(_currentMousePosition);
@@ -87,10 +87,9 @@ namespace GOclient
                     continue;
                 }
 
-                _gameStatus = _lobby.Status;
                 _window.DispatchEvents();
                 _window.Clear();
-                if (!_gameStatus )
+                if (!GameStatus)
                 {
                     _lobby.Update();
                     _lobby.Draw();

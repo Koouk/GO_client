@@ -11,16 +11,16 @@ namespace GOclient
         private Button _passButton, _resignButton;
         private RectangleShape _sidePanel;
         private Board _board;
-        private PlayerColor _color;
+        private Engine _engine;
         private PlayerColor _currentTurn;
         private Tuple<int,int> _lastMove;
         private int _inputStatus;
         public bool InGame { get; private set; }
-        public Game(RenderWindow window, Networking net, PlayerColor Pcolor)
+        public Game(RenderWindow window, Networking net, Engine engine)
         {
             _window = window;
             _net = net;
-            _color = Pcolor;
+            _engine = engine;
             _currentTurn = PlayerColor.white;
             _inputStatus = 0;
             InGame = true;
@@ -39,7 +39,7 @@ namespace GOclient
 
         public void Update()
         {
-            if(_currentTurn == _color)
+            if(_currentTurn == _engine.Color)
             {
                 MakeMove();
             }
@@ -53,7 +53,7 @@ namespace GOclient
 
         public void HandleInput(Vector2f mousePosition)
         {
-            if (_currentTurn == _color && _net.Status == ConnectionStatus.free)
+            if (_currentTurn == _engine.Color && _net.Status == ConnectionStatus.free)
             {
                 if (_passButton.PointInside(mousePosition))
                     _inputStatus = 1;
@@ -145,7 +145,7 @@ namespace GOclient
                 var data = _net.GetData();
                 if(data.Type == "move")
                 {
-                    var subs = data.Type.Split(' ');
+                    var subs = data.Data.Split(' ');
                     var move = new Tuple<int, int>(int.Parse(subs[0]), int.Parse(subs[1]));
                     _board.Move(move, _currentTurn);
                     _currentTurn = (PlayerColor)((int)_currentTurn ^ 1);
