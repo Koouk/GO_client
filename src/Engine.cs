@@ -75,6 +75,32 @@ namespace GOclient
 
         }
 
+
+        private void DrawResult(string txt, Color color)
+        {
+            var text = new Text(txt, _lobby.font)
+            { CharacterSize = _window.Size.Y / 10,
+                FillColor = new Color(255, 234, 153),
+            };
+
+            float textWidth = text.GetGlobalBounds().Width;
+            float textHeight = text.GetGlobalBounds().Height;
+            text.Position = new Vector2f(_window.Size.X / 2 - textWidth * 1.5f / 2, _window.Size.Y / 2 - textHeight);
+
+            if (_finalResult.Data != "resign")
+            {
+                var subs = _finalResult.Data.Split(' ');
+                _window.Draw(new Text("Black player points: " + subs[0], _lobby.font)
+                { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X / 20, _window.Size.Y / 20) });
+
+                _window.Draw(new Text("White player points: " + subs[1], _lobby.font)
+                { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X / 20, _window.Size.Y * 3 / 20) });
+
+            }
+            _window.Draw(text);
+
+        }
+
         private void ResultsScreen()
         {
             if (_net.Status == ConnectionStatus.free && temp == false)
@@ -95,47 +121,27 @@ namespace GOclient
 
             if (temp)
             {
-                Debug.WriteLine(" Result: " + _finalResult.Type + " " + _finalResult.Data);
                 _window.Draw(new RectangleShape() { Size = (Vector2f)_window.Size, FillColor = new Color(230, 255, 255) });
                 if (_finalResult.Type == "error")
                 {
-                    _window.Draw(new Text("Connection error... Check logs or contact administrator to find issue.", _lobby.font)
-                    { CharacterSize = 10, FillColor = SFML.Graphics.Color.White });
+                    _window.Draw(new Text("Connection error... ("+_finalResult.Data+")", _lobby.font)
+                    { CharacterSize = _window.Size.Y / 25, FillColor = SFML.Graphics.Color.Black });
 
                 }
                 else if(_finalResult.Type == "victory")
                 {
-                    var subs = _finalResult.Data.Split(' ');
-                    _window.Draw(new Text("VICTORY!", _lobby.font)
-                    { CharacterSize = _window.Size.Y / 5, FillColor = new Color(255,234,153), Position = new Vector2f(_window.Size.X / 2 - 50, _window.Size.Y / 2 -50) });
-                    _window.Draw(new Text("Black player points: !" + subs[0], _lobby.font)
-                    { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X / 20, _window.Size.Y / 20 ) });
-
-                    _window.Draw(new Text("White player points: !" + subs[1], _lobby.font)
-                    { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X * 3  / 20, _window.Size.Y * 3  / 20) });
+                    DrawResult("VICTORY", new Color(255, 234, 153));
                 }
                 else if(_finalResult.Type == "defeat")
                 {
-                    var subs = _finalResult.Data.Split(' ');
-                    _window.Draw(new Text("DEFEAT!", _lobby.font)
-                    { CharacterSize = _window.Size.Y / 5, FillColor = new Color(153, 0, 0), Position = new Vector2f(_window.Size.X / 2 - 50, _window.Size.Y / 2 - 50) });
-                    _window.Draw(new Text("Black player points: !" + subs[0], _lobby.font)
-                    { CharacterSize = _window.Size.Y /15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X / 20, _window.Size.Y / 20) });
 
-                    _window.Draw(new Text("White player points: !" + subs[1], _lobby.font)
-                    { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X * 3 / 20, _window.Size.Y * 3 / 20) });
+                    DrawResult("DEFEAT", new Color(220, 0, 0));
                 }
                 else if (_finalResult.Type == "draw")
                 {
-                    var subs = _finalResult.Data.Split(' ');
-                    _window.Draw(new Text("DRAW!", _lobby.font)
-                    { CharacterSize = _window.Size.Y / 5, FillColor = new Color(153, 0, 0), Position = new Vector2f(_window.Size.X / 2 - 50, _window.Size.Y / 2 - 50) });
-                    _window.Draw(new Text("Player points: !" + subs[0], _lobby.font)
-                    { CharacterSize = _window.Size.Y / 15, FillColor = new Color(255, 234, 153), Position = new Vector2f(_window.Size.X / 20, _window.Size.Y / 20) });
-
-
+                    DrawResult("DRAW", new Color(123, 234, 153));
+                   
                 }
-
             }
         }
 
@@ -153,7 +159,7 @@ namespace GOclient
                 if (_net.Error == -1)
                 {
                     _window.Draw(new Text("Connection error...", _lobby.font)
-                    { CharacterSize = 10, Position = new Vector2f(_window.Size.X / 2, _window.Size.Y / 2) , FillColor = SFML.Graphics.Color.White});
+                    { CharacterSize = _window.Size.Y / 18, Position = new Vector2f(_window.Size.X / 2, _window.Size.Y / 2) , FillColor = SFML.Graphics.Color.White});
                     _window.Display();
                     continue;
                 }
