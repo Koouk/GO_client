@@ -49,11 +49,19 @@ namespace GOclient
 
         public DataTemplate GetData()
         {
-            //obsluzyc wyjatek !
-            var data = JsonSerializer.Deserialize<DataTemplate>(RecData);
-            Status = ConnectionStatus.free;
-            Debug.WriteLine(" Recieved data: " + data.Data + " T: " + data.Type);
-            return data;
+            try
+            {
+                var data = JsonSerializer.Deserialize<DataTemplate>(RecData);
+                Status = ConnectionStatus.free;
+                Debug.WriteLine(" Recieved data: " + data.Data + " T: " + data.Type);
+                return data;
+            }
+            catch (Exception exc)
+            {
+                Error = -1;
+                Debug.WriteLine(" Wrong data format: " + exc.Message.ToString());
+                return new DataTemplate { Type = "error", Data = "error" };
+            }
         }
         public void Connect()
         {
@@ -72,8 +80,9 @@ namespace GOclient
                 Type = type,
                 Data = data
             };
-
-            string jsonString = JsonSerializer.Serialize(structure);
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(structure);
 
             Debug.WriteLine(" Send data: " + jsonString);
             SendBuffer buffer = new SendBuffer
@@ -81,7 +90,7 @@ namespace GOclient
                 buff = Encoding.ASCII.GetBytes(jsonString + "\n") 
             };
 
-            try { 
+            
                 _socket.BeginSend(buffer.buff, 0, buffer.buff.Length, 0, new AsyncCallback(SendCallback), buffer);
             }
             catch (Exception exc)

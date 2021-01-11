@@ -11,9 +11,15 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="content\fonts\arial.ttf" />
+    <None Remove="Content\images\gboard.png" />
+    <None Remove="Content\images\go-board.jpg" />
+    <None Remove="Content\images\go-board.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\fonts\arial.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gboard.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -25,5 +31,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SFML.Net" Version="2.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="content\images\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Content\images\go-board.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 </Project>

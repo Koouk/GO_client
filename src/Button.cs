@@ -9,10 +9,10 @@ namespace GOclient
     {
         private Font _font;
         private Text _text;
-        private RectangleShape _button;
+        public RectangleShape ButtonShape { get; set; }
         public bool Clicked { get; set; }
 
-        public Button(int size, Vector2f position, string text)
+        public Button(int size, Vector2f position, string text, Color color)
         {
 
              _font = new Font(@"content\fonts\arial.ttf");
@@ -24,24 +24,26 @@ namespace GOclient
             float textHeight = _text.GetGlobalBounds().Height;
             float xOffset = _text.GetLocalBounds().Left;
             float yOffset = _text.GetLocalBounds().Top;
-           // _text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
-            _text.Position = position;
+            
+            _text.Position = new Vector2f(position.X - textWidth * 1.5f / 2, position.Y - textHeight);
 
             Clicked = false;
-            _button = new RectangleShape
+            ButtonShape = new RectangleShape
             {
-                Size = new Vector2f(textWidth * 1.1f, textHeight * 2),
-                Position = position,
-                FillColor = Color.Black
+                Size = new Vector2f(textWidth * 1.5f, textHeight * 2f),
+                Position = new Vector2f(position.X - textWidth * 1.5f / 2, position.Y - textHeight),
+                FillColor = color
             };
+
+            _text.Position = new Vector2f(ButtonShape.Position.X + textWidth / 4f - xOffset / 2, ButtonShape.Position.Y + textHeight / 4f - yOffset / 2);
 
         }
 
         public bool PointInside(Vector2f point)
         {
             
-            return _button.Position.X < point.X && point.X < _button.Position.X + _button.Size.X
-                && _button.Position.Y < point.Y && point.Y < _button.Position.Y + _button.Size.Y;
+            return ButtonShape.Position.X < point.X && point.X < ButtonShape.Position.X + ButtonShape.Size.X
+                && ButtonShape.Position.Y < point.Y && point.Y < ButtonShape.Position.Y + ButtonShape.Size.Y;
 
         }
 
@@ -49,7 +51,7 @@ namespace GOclient
         public void Draw(RenderTarget target, RenderStates states)
         {
 
-            target.Draw(_button);
+            target.Draw(ButtonShape);
             target.Draw(_text);
         }
 

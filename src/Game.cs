@@ -10,6 +10,7 @@ namespace GOclient
         private Networking _net;
         private Button _passButton, _resignButton;
         private RectangleShape _sidePanel;
+        private CircleShape _colorCircleC, _colorCircleM ;
         private Board _board;
         private Engine _engine;
         private PlayerColor _currentTurn;
@@ -21,19 +22,36 @@ namespace GOclient
             _window = window;
             _net = net;
             _engine = engine;
-            _currentTurn = PlayerColor.white;
+            _currentTurn = PlayerColor.black;
             _inputStatus = 0;
             InGame = true;
 
             _board = new Board(9, (float)_window.Size.Y, _window.Size.X * 0.75f);
-            _passButton = new Button(40, new Vector2f(_window.Size.X * 0.80f, _window.Size.Y * 0.33f ), "PASS" );
-            _resignButton = new Button(40, new Vector2f(_window.Size.X * 0.80f, _window.Size.Y * 0.66f), "RESIGN");
+            _passButton = new Button((int)(_window.Size.X/ 25f), new Vector2f(_window.Size.X * 0.875f, _window.Size.Y * 0.5f ), "PASS", Color.Black);
+            _resignButton = new Button((int)(_window.Size.X / 25f), new Vector2f(_window.Size.X * 0.875f, _window.Size.Y * 0.7f), "RESIGN", Color.Black);
+            _colorCircleC = new CircleShape()
+            {
+                Radius = _window.Size.Y * 0.05f,
+                OutlineColor = Color.Black,
+                OutlineThickness = 5f,
+                FillColor = Color.White,
+                Position = new Vector2f(_window.Size.X * 0.875f, _window.Size.Y * 0.2f)
+            };
+
+            _colorCircleM = new CircleShape()
+            {
+                Radius = _window.Size.Y * 0.05f,
+                OutlineColor = Color.Black,
+                OutlineThickness = 5f,
+                Position = new Vector2f(_window.Size.X * 0.875f, _window.Size.Y * 0.8f)
+            };
+
 
             _sidePanel = new RectangleShape
             {
                 Size = new Vector2f(_window.Size.X * 0.25f, _window.Size.Y),
                 Position = new Vector2f(_window.Size.X * 0.75f, 0),
-                FillColor = Color.Yellow
+                FillColor = new Color(111, 79, 40)
             };
         }
 
@@ -81,8 +99,19 @@ namespace GOclient
         private void DrawPanel()
         {
 
-           
             _window.Draw(_sidePanel);
+
+            if (_currentTurn == PlayerColor.white)
+                _colorCircleC.FillColor = Color.White;
+            else
+                _colorCircleC.FillColor = Color.Black;
+
+            if (_engine.Color == PlayerColor.white)
+                _colorCircleM.FillColor = Color.White;
+            else
+                _colorCircleM.FillColor = Color.Black;
+            _window.Draw(_colorCircleC);
+            _window.Draw(_colorCircleM);
             _window.Draw(_passButton);
             _window.Draw(_resignButton);
         }
@@ -125,9 +154,10 @@ namespace GOclient
                     }
                     
                 }
-                else if(rec.Type == "end")
+                else if(rec.Type == "end" || rec.Type =="error")
                 {
                     InGame = false;
+
                 }
                 _inputStatus = 0;
             }
@@ -154,7 +184,7 @@ namespace GOclient
                 {
                     _currentTurn = (PlayerColor)((int)_currentTurn ^ 1);
                 }
-                else if(data.Type == "end")
+                else if(data.Type == "end" || data.Type == "error")
                 {
                     InGame = false;
                 }
