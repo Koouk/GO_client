@@ -73,7 +73,7 @@ namespace GOclient
             {
                 var response = _net.GetData();
                 _net.Status = ConnectionStatus.free;
-                if (response.Type == "found" )
+                if (response.Type == "lobby" )
                 {
                     if (response.Data == "white")
                         _engine.Color = PlayerColor.white;

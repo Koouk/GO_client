@@ -7,7 +7,7 @@ namespace GOclient
 {
     public enum PlayerColor
     {
-        
+
         white,
         black,
         none
@@ -25,17 +25,33 @@ namespace GOclient
         private Lobby _lobby;
         private Vector2f _currentMousePosition;
 
-        private bool temp = false; 
+        private bool temp = false;
         DataTemplate _finalResult;
         private void Initialize()
         {
             var size = VideoMode.DesktopMode;
 
-            _window = new RenderWindow(new VideoMode(size.Width / 2 , size.Width * 3 / 8), "SFML.NET");
-            _net = new Networking("192.168.1.12", 10024);
+            _window = new RenderWindow(new VideoMode(size.Width / 2, size.Width * 3 / 8), "Go");
+            try
+            {
+
+                string ip, port;
+                using (System.IO.StreamReader reader = new System.IO.StreamReader("content/network/serwer.txt"))
+                {
+                    ip = reader.ReadLine();
+                    port = reader.ReadLine();
+                }
+                _net = new Networking(ip, int.Parse(port));
+            }
+            catch (System.IO.IOException)
+            {
+                _net = new Networking("192.168.1.2", 10024);
+            }
+
+
             _net.Connect();
 
-            _game = new Game(_window,_net, this);
+            _game = new Game(_window, _net, this);
             _lobby = new Lobby(_window, _net, this);
 
 
@@ -55,15 +71,15 @@ namespace GOclient
                     {
                         window.Close();
                     }
-                    
+
                 };
 
-            _window.MouseButtonPressed += 
+            _window.MouseButtonPressed +=
                 (sender, e) =>
                 {
-                Window window = (Window)sender;
-                if (e.Button == Mouse.Button.Left)
-                {
+                    Window window = (Window)sender;
+                    if (e.Button == Mouse.Button.Left)
+                    {
                         _currentMousePosition = _window.MapPixelToCoords(Mouse.GetPosition(_window));
                         if (!GameStatus)
                             _lobby.HandleInput(_currentMousePosition);
@@ -71,7 +87,7 @@ namespace GOclient
                             _game.HandleInput(_currentMousePosition);
                     }
 
-            };
+                };
 
         }
 
@@ -79,7 +95,8 @@ namespace GOclient
         private void DrawResult(string txt, Color color)
         {
             var text = new Text(txt, _lobby.font)
-            { CharacterSize = _window.Size.Y / 10,
+            {
+                CharacterSize = _window.Size.Y / 10,
                 FillColor = new Color(255, 234, 153),
             };
 
@@ -105,7 +122,7 @@ namespace GOclient
         {
             if (_net.Status == ConnectionStatus.free && temp == false)
             {
-                
+
                 _net.Send("request", "results");
 
             }
@@ -124,15 +141,15 @@ namespace GOclient
                 _window.Draw(new RectangleShape() { Size = (Vector2f)_window.Size, FillColor = new Color(230, 255, 255) });
                 if (_finalResult.Type == "error")
                 {
-                    _window.Draw(new Text("Connection error... ("+_finalResult.Data+")", _lobby.font)
+                    _window.Draw(new Text("Connection error... Check logs or contact administrator to find issue.", _lobby.font)
                     { CharacterSize = _window.Size.Y / 25, FillColor = SFML.Graphics.Color.Black });
 
                 }
-                else if(_finalResult.Type == "victory")
+                else if (_finalResult.Type == "victory")
                 {
                     DrawResult("VICTORY", new Color(255, 234, 153));
                 }
-                else if(_finalResult.Type == "defeat")
+                else if (_finalResult.Type == "defeat")
                 {
 
                     DrawResult("DEFEAT", new Color(220, 0, 0));
@@ -140,7 +157,7 @@ namespace GOclient
                 else if (_finalResult.Type == "draw")
                 {
                     DrawResult("DRAW", new Color(123, 234, 153));
-                   
+
                 }
             }
         }
@@ -159,14 +176,14 @@ namespace GOclient
                 if (_net.Error == -1)
                 {
                     _window.Draw(new Text("Connection error...", _lobby.font)
-                    { CharacterSize = _window.Size.Y / 18, Position = new Vector2f(_window.Size.X / 2, _window.Size.Y / 2) , FillColor = SFML.Graphics.Color.White});
+                    { CharacterSize = _window.Size.Y / 18, Position = new Vector2f(_window.Size.X / 2, _window.Size.Y / 2), FillColor = SFML.Graphics.Color.White });
                     _window.Display();
                     continue;
                 }
 
                 if (!_game.InGame)
                 {
-                  
+
                     //pobierz wyniki, narysuj, zakoncz polaczenie i wyjdz
                     ResultsScreen();
                     _window.Display();
@@ -189,5 +206,5 @@ namespace GOclient
         }
     }
 
-    
+
 }

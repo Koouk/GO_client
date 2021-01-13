@@ -133,7 +133,7 @@ namespace GOclient
                 if (count == 0)
                 {
 
-                    Console.WriteLine(" Connection closed ");
+                    Debug.WriteLine(" Connection closed ");
                     return;
 
                 }
